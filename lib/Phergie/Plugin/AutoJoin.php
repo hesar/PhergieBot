@@ -38,6 +38,8 @@
  */
 class Phergie_Plugin_AutoJoin extends Phergie_Plugin_Abstract
 {
+    private $counter = 0;
+
     /**
      * Intercepts the end of the "message of the day" response and responds by
      * joining the channels specified in the configuration file.
@@ -46,12 +48,18 @@ class Phergie_Plugin_AutoJoin extends Phergie_Plugin_Abstract
      */
     public function onResponse()
     {
-        //how many networks to make autoconnect ?
-        $howMany = count($this->config['connections']);
         switch ($this->getEvent()->getCode()) {
         case Phergie_Event_Response::RPL_ENDOFMOTD:
         case Phergie_Event_Response::ERR_NOMOTD:
-            $keys = null;
+            $this->counter++; //one channel connected
+            $this->callJoin();
+        }
+    }
+    /**
+     * called after all channels are connected 
+     */
+    private function callJoin() {
+        $keys = null;
             if ($channels = $this->config['autojoin.channels']) {
                 if (is_array($channels)) {
                     // Support autojoin.channels being in these formats:
@@ -69,8 +77,8 @@ class Phergie_Plugin_AutoJoin extends Phergie_Plugin_Abstract
 
                 $this->doJoin($channels, $keys);
             }
-            $this->getPluginHandler()->removePlugin($this);
-        }
+            if($this->counter == count($this->config['connections']))
+           { $this->getPluginHandler()->removePlugin($this); }
     }
 //        public function onResponse()
 //    {
