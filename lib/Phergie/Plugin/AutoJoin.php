@@ -55,6 +55,7 @@ class Phergie_Plugin_AutoJoin extends Phergie_Plugin_Abstract
             $this->callJoin();
         }
     }
+    
     /**
      * called after all channels are connected 
      */
