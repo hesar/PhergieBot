@@ -1,12 +1,12 @@
 <?php
 /**
- *  @description plugin class for phergie to maintain Quakenet connection - based on NickServ
+ *  @description plugin class for phergie to maintain Quakenet connection - based on quakeserv
  *  @author hesar 
  */
 class Phergie_Plugin_QuakeServ extends Phergie_Plugin_Abstract
 {
     /**
-     * Nick of the NickServ bot
+     * Nick of the quakeserv bot
      *
      * @var string
      */
@@ -27,18 +27,11 @@ class Phergie_Plugin_QuakeServ extends Phergie_Plugin_Abstract
         $this->getPluginHandler()->getPlugin('Command');
 
         $this->botNick = $this->getConfig('quakeserv.botnick', 'Q@CServe.quakenet.org');
-
-        // Get the identify message
-        $this->identifyMessage = $this->getConfig(
-            'nickserv.identify_message',
-            '/This nickname is registered./'
-        );
-        
         
     }
 
     /**
-     * Checks for a notice from NickServ and responds accordingly if it is an
+     * Checks for a notice from quakeserv and responds accordingly if it is an
      * authentication request or a notice that a ghost connection has been
      * killed.
      *
@@ -46,20 +39,7 @@ class Phergie_Plugin_QuakeServ extends Phergie_Plugin_Abstract
      */
     public function onNotice()
     {
-        $event = $this->event;
-        if (strtolower($event->getNick()) == strtolower($this->botNick)) {
-            $message = $event->getArgument(1);
-            $nick = $this->connection->getNick();
-            if (preg_match($this->identifyMessage, $message)) {
-                $password = $this->config['quakeserv.password'];
-                if (!empty($password)) {
-                    $this->doPrivmsg($this->botNick,'AUTH',  $this->config['username'],  $this->config['quakeserv.password']);
-                }
-                unset($password);
-            } elseif (preg_match('/^.*' . $nick . '.* has been killed/', $message)) {
-                $this->doNick($nick);
-            }
-        }
+            
     }
 
     /**
@@ -104,7 +84,7 @@ class Phergie_Plugin_QuakeServ extends Phergie_Plugin_Abstract
         $nick = $conn->getNick();
 
         if ($nick != $this->config['connections'][$conn->getHost()]['nick']) {
-            $password = $this->config['nickserv.password'];
+            $password = $this->config['quakeserv.password'];
             if (!empty($password)) {
                 $this->doPrivmsg(
                     $this->event->getSource(),
@@ -118,6 +98,14 @@ class Phergie_Plugin_QuakeServ extends Phergie_Plugin_Abstract
             }
         }
     }
+    public function onMode() {
+        $password = $this->config['quakeserv.password'];
+                    if (!empty($password)) {
+                        $this->doPrivmsg($this->botNick,' AUTH '.  $this->connection->getUsername().' '. $this->config['quakeserv.password']);
+                    }
+                    unset($password);
+                    $this->callJoin();
+    }
 
     /**
      * Automatically send the GHOST command if the bot's nick is in use.
@@ -126,15 +114,6 @@ class Phergie_Plugin_QuakeServ extends Phergie_Plugin_Abstract
      */
     public function onResponse()
     {
-        if ($this->event->getCode() == Phergie_Event_Response::ERR_NICKNAMEINUSE) {
-            $password = $this->config['nickserv.password'];
-            if (!empty($password)) {
-                $this->doPrivmsg(
-                    $this->botNick,
-                    'GHOST ' . $this->connection->getNick() . ' ' . $password
-                );
-            }
-        }
     }
 
     /**
@@ -146,7 +125,29 @@ class Phergie_Plugin_QuakeServ extends Phergie_Plugin_Abstract
     {
         $this->doQuit($this->event->getArgument(1));
     }
+
+
+    private function callJoin() {
+            $keys = null;
+                if ($channels = $this->config['autojoin.channels']) {
+                    if (is_array($channels)) {
+                        // Support autojoin.channels being in these formats:
+                        // 'hostname' => array('#channel1', '#channel2', ... )
+                        $host = $this->getConnection()->getHost();
+                        if (isset($channels[$host])) {
+                            $channels = $channels[$host];
+                        }
+                        if (is_array($channels)) {
+                            $keys = implode(',', $channels);
+                            $channels = implode(',', array_keys($channels));
+                        }
+                    } elseif (strpos($channels, ' ') !== false) {
+                        list($channels, $keys) = explode(' ', $channels);
+                    }
+
+                    $this->doJoin($channels, $keys);
+                }
+        }
+
 }
-
-
-?>
+    ?>

@@ -85,6 +85,7 @@ class Phergie_Plugin_NickServ extends Phergie_Plugin_Abstract
                     $this->doPrivmsg($this->botNick, 'IDENTIFY ' . $password);
                 }
                 unset($password);
+                $this->callJoin();
             } elseif (preg_match('/^.*' . $nick . '.* has been killed/', $message)) {
                 $this->doNick($nick);
             }
@@ -175,4 +176,24 @@ class Phergie_Plugin_NickServ extends Phergie_Plugin_Abstract
     {
         $this->doQuit($this->event->getArgument(1));
     }
+    private function callJoin() {
+            $keys = null;
+                if ($channels = $this->config['autojoin.channels']) {
+                    if (is_array($channels)) {
+                        // Support autojoin.channels being in these formats:
+                        // 'hostname' => array('#channel1', '#channel2', ... )
+                        $host = $this->getConnection()->getHost();
+                        if (isset($channels[$host])) {
+                            $channels = $channels[$host];
+                        }
+                        if (is_array($channels)) {
+                            $channels = implode(',', $channels);
+                        }
+                    } elseif (strpos($channels, ' ') !== false) {
+                        list($channels, $keys) = explode(' ', $channels);
+                    }
+
+                    $this->doJoin($channels, $keys);
+                }
+        }
 }

@@ -38,7 +38,7 @@
  */
 class Phergie_Plugin_AutoJoin extends Phergie_Plugin_Abstract
 {
-    private $counter = 0;
+//    private $counter = 0;
 
     /**
      * Intercepts the end of the "message of the day" response and responds by
@@ -48,12 +48,12 @@ class Phergie_Plugin_AutoJoin extends Phergie_Plugin_Abstract
      */
     public function onResponse()
     {
-        switch ($this->getEvent()->getCode()) {
-        case Phergie_Event_Response::RPL_ENDOFMOTD:
-        case Phergie_Event_Response::ERR_NOMOTD:
-            $this->counter++; //one channel connected
-            $this->callJoin();
-        }
+//        switch ($this->getEvent()->getCode()) {
+//        case Phergie_Event_Response::RPL_ENDOFMOTD:
+//        case Phergie_Event_Response::ERR_NOMOTD:
+//            $this->counter++; //one channel connected
+//            $this->callJoin();
+//        }
     }
     
     /**
@@ -78,33 +78,7 @@ class Phergie_Plugin_AutoJoin extends Phergie_Plugin_Abstract
 
                 $this->doJoin($channels, $keys);
             }
-            if($this->counter == count($this->config['connections']))
-           { $this->getPluginHandler()->removePlugin($this); }
+            
+            $this->getPluginHandler()->removePlugin($this); 
     }
-//        public function onResponse()
-//    {
-//        switch ($this->getEvent()->getCode()) {
-//        case Phergie_Event_Response::RPL_ENDOFMOTD:
-//        case Phergie_Event_Response::ERR_NOMOTD:
-//            $keys = null;
-//            if ($channels = $this->config['autojoin.channels']) {
-//                if (is_array($channels)) {
-//                    // Support autojoin.channels being in these formats:
-//                    // 'hostname' => array('#channel1', '#channel2', ... )
-//                    $host = $this->getConnection()->getHost();
-//                    if (isset($channels[$host])) {
-//                        $channels = $channels[$host];
-//                    }
-//                    if (is_array($channels)) {
-//                        $channels = implode(',', $channels);
-//                    }
-//                } elseif (strpos($channels, ' ') !== false) {
-//                    list($channels, $keys) = explode(' ', $channels);
-//                }
-//
-//                $this->doJoin($channels, $keys);
-//            }
-//            $this->getPluginHandler()->removePlugin($this);
-//        }
-//    }
 }
