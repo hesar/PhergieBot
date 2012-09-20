@@ -26,10 +26,10 @@ return array(
     ),
 
     'processor' => 'async',
-    'processor.options' => array('usec' => 200000),
+    'processor.options' => array('usec' => 1000000),
     // Time zone. See: http://www.php.net/manual/en/timezones.php
     'timezone' => 'UTC',
-
+    'debug' => true,
     // Whitelist of plugins to load
     'plugins' => array(
         // To enable a plugin, simply add a string to this array containing
@@ -78,7 +78,10 @@ return array(
         'NickServ',
         'QuakeServ',
         'Command',
-        'CopyCommand'
+        'CopyCommand',
+        'UserInfo',
+        'Remind',
+        'GoogleCalendar'
     ),
 
     // If set to true, this allows any plugin dependencies for plugins
@@ -119,7 +122,18 @@ return array(
     'nickserv.password' => '#1hesarBot',
     'quakeserv.password' => '#1hesarBot',
     'autojoin.channels' => array(
-        'irc.quakenet.org' => array('#bluebot' => 'test','#bluebot2' => 'test'), //array('#channel' => 'channel key')
-        'irc.rizon.net' => '#bluebot'
+        'irc.quakenet.org' => array('#bluebot' => 'test'), //array('#channel' => 'channel key')
+        'irc.rizon.net' => array('#bluebot2' => 'test')
+    ),
+    // define slap copy channels and networks
+    'copycommand.channels' => array(
+        'channelFrom' => array('irc.quakenet.org' , '#bluebot'),
+        'channelTo' => array('irc.rizon.net' , '#bluebot2')
+    ),
+    'copycommand.counter' => 1, //how many lines to copy after slap (ba carefull with this one)
+    'googlecalendars' => array(
+        'sms2' => 'diw2.br@gmail.com',
+        'sms3' => 'diw3.br@gmail.com',
+        'sms4' => 'diw4.br@gmail.com',
     )
 );

@@ -36,7 +36,7 @@ class Phergie_Plugin_Handler implements IteratorAggregate, Countable
      * @var array
      */
     protected $plugins;
-
+    
     /**
      * Paths in which to search for plugin class files
      *
@@ -75,7 +75,7 @@ class Phergie_Plugin_Handler implements IteratorAggregate, Countable
      * @var string
      */
     protected $iteratorClass = 'Phergie_Plugin_Iterator';
-
+    
     /**
      * Constructor to initialize class properties and add the path for core
      * plugins.

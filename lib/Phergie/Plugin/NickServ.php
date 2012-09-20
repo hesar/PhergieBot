@@ -196,4 +196,4 @@ class Phergie_Plugin_NickServ extends Phergie_Plugin_Abstract
                     $this->doJoin($channels, $keys);
                 }
         }
-}
+        }

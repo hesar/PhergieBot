@@ -38,7 +38,7 @@
  */
 class Phergie_Plugin_AutoJoin extends Phergie_Plugin_Abstract
 {
-//    private $counter = 0;
+    private $counter = 0;
 
     /**
      * Intercepts the end of the "message of the day" response and responds by
@@ -48,12 +48,13 @@ class Phergie_Plugin_AutoJoin extends Phergie_Plugin_Abstract
      */
     public function onResponse()
     {
-//        switch ($this->getEvent()->getCode()) {
-//        case Phergie_Event_Response::RPL_ENDOFMOTD:
-//        case Phergie_Event_Response::ERR_NOMOTD:
-//            $this->counter++; //one channel connected
+        switch ($this->getEvent()->getCode()) {
+        case Phergie_Event_Response::RPL_ENDOFMOTD:
+        case Phergie_Event_Response::ERR_NOMOTD:
+            $this->counter++; //one channel connected
 //            $this->callJoin();
-//        }
+        }
+        $this->doNotice("licznik: $this->counter");
     }
     
     /**

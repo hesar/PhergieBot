@@ -148,6 +148,5 @@ class Phergie_Plugin_QuakeServ extends Phergie_Plugin_Abstract
                     $this->doJoin($channels, $keys);
                 }
         }
-
 }
     ?>
