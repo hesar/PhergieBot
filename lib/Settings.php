@@ -130,6 +130,10 @@ return array(
         'channelFrom' => array('irc.quakenet.org' , '#bluebot'),
         'channelTo' => array('irc.rizon.net' , '#bluebot2')
     ),
+    /*
+     * array of users that are able to op themselves - BY nick
+     */
+    'copycommand.users' => array("hesar"),
     'copycommand.counter' => 1, //how many lines to copy after slap (ba carefull with this one)
     'googlecalendars' => array(
         'sms2' => 'diw2.br@gmail.com',

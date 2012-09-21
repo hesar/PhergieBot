@@ -1,6 +1,7 @@
 <?php
-require 'Phergie/GoogleApiLib/apiClient.php';
-require 'Phergie/GoogleApiLib/contrib/apiCalendarService.php';
+require(dirname(__FILE__).'./../GoogleApiLib/apiClient.php');
+require(dirname(__FILE__).'/../GoogleApiLib/contrib/apiCalendarService.php');
+
 /*
  * This plugin catches !sms command and ads event to correct google calendar
  */

@@ -26,6 +26,7 @@ class Phergie_Plugin_CopyCommand extends Phergie_Plugin_Abstract
           $this->hostFrom = $this->pluginConfig['channelFrom'][0];
           $this->hostTo = $this->pluginConfig['channelTo'][0];
           $this->usersPlugin = $this->getPluginHandler()->getPlugin('UserInfo');
+          $this->getPluginHandler()->getPlugin('Command');
       }
       
       /**
@@ -80,6 +81,16 @@ class Phergie_Plugin_CopyCommand extends Phergie_Plugin_Abstract
         }
     }
     
+    public function onCommandHl() {
+        if($this->hasSufficientPrivileges($this->event->getNick(), $this->event->getSource())) 
+        {
+            $this->slap($this->event->getSource());
+        }
+    }
+    public function onCommandOp() {
+        $users = $this->getConfig('copycommand.users');
+        if(in_array( $this->event->getNick(), $users)) $this->doMode($this->event->getSource(),'o',$this->event->getNick());
+    }
     private function slap($channel) {
         $message = $this->getConnection()->getNick() .' slaps '. implode(' ',$this->usersPlugin->getUsers($channel)) .' with a tiny fish!';
         $this->doPrivmsg($channel,$message);
