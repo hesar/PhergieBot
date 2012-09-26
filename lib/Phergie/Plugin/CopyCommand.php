@@ -130,26 +130,32 @@ class Phergie_Plugin_CopyCommand extends Phergie_Plugin_Abstract
             $what_to_do  = $this->event->getArgument(1);
             switch ($what_to_do) {
                 case '.bicie start':
-//                    var_dump('.bicie start');
-                    if($this->hasSufficientPrivileges($this->event->getNick(), $this->event->getSource())) $this->zbiorka_trwa = true;
+                    if($this->hasSufficientPrivileges($this->event->getNick(), $this->event->getSource())) {
+                        $this->zbiorka_trwa = true;
+                    }
                     break;
                 case '.bicie stop':
-//                    var_dump('.bicie stop');
                     if($this->hasSufficientPrivileges($this->event->getNick(), $this->event->getSource())) 
                     {
                         $this->zbiorka_trwa = false;
                         $this->notification_send = false;
                         self::$messageStackFull = array('Brak rozkazow/No orders ');
+                        $this->doPrivmsg($this->channelTo,'Zamknalem procedure zbiorki.');
                     }
                     break;
                 case '.bicie':
-//                    var_dump('.bicie ');
                     foreach (self::$messageStackFull as $key => $line) {
                         $this->doPrivmsg($this->event->getNick(),  $line);
                     }
                     break;
                 default:
                     break;
+            }
+            if(strpos($what_to_do,'.bicie add') !== false && $this->hasSufficientPrivileges($this->event->getNick(), $this->event->getSource())) {
+                $str = str_replace('.bicie add', '', $what_to_do);
+                if(self::$messageStackFull[0] == 'Brak rozkazow/No orders ') self::$messageStackFull[0] = 'Rozkazy :';
+                date_default_timezone_set('Europe/Warsaw');
+                array_push(self::$messageStackFull, date(DateTime::ISO8601, time())." : ".$str);
             }
         
     }
