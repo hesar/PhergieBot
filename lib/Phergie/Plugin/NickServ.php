@@ -41,7 +41,7 @@ class Phergie_Plugin_NickServ extends Phergie_Plugin_Abstract
      * @var string
      */
     protected $botNick;
-
+    private $authed = false;
     /**
     * Identify message
     */
@@ -75,8 +75,9 @@ class Phergie_Plugin_NickServ extends Phergie_Plugin_Abstract
      */
     public function onNotice()
     {
+        if($this->authed) return;
         $event = $this->event;
-        if (strtolower($event->getNick()) == strtolower($this->botNick)) {
+        if (strtolower($event->getNick()) == strtolower($this->botNick) && $this->getConnection()->getHost() == 'irc.rizon.net') {
             $message = $event->getArgument(1);
             $nick = $this->connection->getNick();
             if (preg_match($this->identifyMessage, $message)) {
@@ -85,11 +86,16 @@ class Phergie_Plugin_NickServ extends Phergie_Plugin_Abstract
                     $this->doPrivmsg($this->botNick, 'IDENTIFY ' . $password);
                 }
                 unset($password);
-                $this->callJoin();
+//                $this->callJoin();
             } elseif (preg_match('/^.*' . $nick . '.* has been killed/', $message)) {
                 $this->doNick($nick);
             }
         }
+        if($this->getConnection()->getHost() == "irc.rizon.net" && $this->event->getArgument(1)=='Password accepted - you are now recognized.')
+            {
+                $this->authed = true;
+                $this->callJoin();
+            }
     }
 
     /**
@@ -178,7 +184,7 @@ class Phergie_Plugin_NickServ extends Phergie_Plugin_Abstract
     }
     private function callJoin() {
             $keys = null;
-                if ($channels = $this->config['autojoin.channels']) {
+                if ($channels = $this->config['autojoin.channels']['irc.rizon.net']) {
                     if (is_array($channels)) {
                         // Support autojoin.channels being in these formats:
                         // 'hostname' => array('#channel1', '#channel2', ... )

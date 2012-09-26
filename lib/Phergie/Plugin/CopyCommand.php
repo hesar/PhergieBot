@@ -14,6 +14,9 @@ class Phergie_Plugin_CopyCommand extends Phergie_Plugin_Abstract
       private $slap = false;
       private $slapNick; //nick of slapper ;)
       private $counter = 0;
+      private $zbiorka_trwa = false;
+      private $notification_send = false;
+      public static $messageStackFull = array('Brak rozkazow/No orders ');
 
       /**
        * set up some configuration and check if it's all necessary 
@@ -35,16 +38,27 @@ class Phergie_Plugin_CopyCommand extends Phergie_Plugin_Abstract
        * also sets flag for startListening for true 
        */
       public function onAction() {
-          if($this->getConnection()->getHost() == $this->hostFrom && $this->event->getSource() == $this->channelFrom && $this->hasSufficientPrivileges($this->event->getNick(),$this->event->getSource()))
+//          var_dump(strpos($this->event->getArgument(1),'bluerose'));
+//          var_dump(strpos($this->event->getArgument(1),'bluerose') != false);
+          if($this->getConnection()->getHost() == $this->hostFrom && $this->event->getSource() == $this->channelFrom && $this->hasSufficientPrivileges($this->event->getNick(),$this->event->getSource()) && strpos($this->event->getArgument(1),'bluerose') !== false)
           {
               $this->startListening = true;
               $this->slap = true;
               $this->slapNick = $this->event->getNick();
               $this->counter = $this->getConfig('copycommand.counter');
+              if(self::$messageStackFull[0] == 'Brak rozkazow/No orders ') self::$messageStackFull[0] = 'Rozkazy :';
+              $this->zbiorka_trwa = true;
           }
     }
     
     public function onResponse() {    }
+    
+    public function onJoin() {
+            if($this->zbiorka_trwa && $this->getConnection()->getHost() == $this->hostTo) 
+                {
+                    $this->doPrivmsg($this->event->getSource(), $this->event->getNick().' trwa zbiorka - szczegolowe info komenda: .bicie ');
+                }
+        }
 
     /**
      * 1. check if request comes from correct channel 
@@ -52,11 +66,27 @@ class Phergie_Plugin_CopyCommand extends Phergie_Plugin_Abstract
      * 3. push message and decrement counter
      */
     public function onPrivmsg() {
+//        var_dump(strpos($this->event->getArgument(1),'.hl'));
+        if($this->getConnection()->getHost() == $this->hostFrom && $this->event->getSource() == $this->channelFrom && $this->hasSufficientPrivileges($this->event->getNick(),$this->event->getSource()) && strpos($this->event->getArgument(1),'.hl') !== false)
+          {
+              $this->startListening = true;
+              $this->slap = true;
+              $this->slapNick = $this->event->getNick();
+              $this->counter = $this->getConfig('copycommand.counter');
+              if(self::$messageStackFull[0] == 'Brak rozkazow/No orders ') self::$messageStackFull[0] = 'Rozkazy :';
+              $this->zbiorka_trwa = true;
+              return;
+          }
+          
         if($this->startListening && $this->getConnection()->getHost() == $this->hostFrom && $this->counter != 0) {
             if($this->getEvent()->getNick() == $this->slapNick) {
                 $dottedNick = substr($this->slapNick, 0, 1).'.'.substr($this->slapNick, 1, strlen($this->slapNick));
                 self::$messageStack .= $dottedNick .' : ';
                 self::$messageStack .= $this->event->getArgument(1);
+                if($this->zbiorka_trwa) {
+                    date_default_timezone_set('Europe/Warsaw');
+                    array_push(self::$messageStackFull, date (DateTime::ISO8601, time())." : ".$this->event->getArgument(1));
+                }
                 $this->counter--; //one got
                 if($this->counter == 0)
                 {
@@ -72,6 +102,10 @@ class Phergie_Plugin_CopyCommand extends Phergie_Plugin_Abstract
      */
     public function onTick() {
         if($this->slap) $this->slap($this->channelTo);
+        if($this->connection->getHost() == $this->hostTo && $this->zbiorka_trwa && $this->notification_send == false) {
+            $this->doPrivmsg($this->channelTo,'Urochomilem procedure zbiorki: .bicie start');
+            $this->notification_send = true;
+        }
         
         if(strlen(self::$messageStack) != 0 && $this->getConnection()->getHost() == $this->hostTo) 
         {
@@ -90,6 +124,34 @@ class Phergie_Plugin_CopyCommand extends Phergie_Plugin_Abstract
     public function onCommandOp() {
         $users = $this->getConfig('copycommand.users');
         if(in_array( $this->event->getNick(), $users)) $this->doMode($this->event->getSource(),'o',$this->event->getNick());
+    }
+    public function onCommandBicie() {
+        
+            $what_to_do  = $this->event->getArgument(1);
+            switch ($what_to_do) {
+                case '.bicie start':
+//                    var_dump('.bicie start');
+                    if($this->hasSufficientPrivileges($this->event->getNick(), $this->event->getSource())) $this->zbiorka_trwa = true;
+                    break;
+                case '.bicie stop':
+//                    var_dump('.bicie stop');
+                    if($this->hasSufficientPrivileges($this->event->getNick(), $this->event->getSource())) 
+                    {
+                        $this->zbiorka_trwa = false;
+                        $this->notification_send = false;
+                        self::$messageStackFull = array('Brak rozkazow/No orders ');
+                    }
+                    break;
+                case '.bicie':
+//                    var_dump('.bicie ');
+                    foreach (self::$messageStackFull as $key => $line) {
+                        $this->doPrivmsg($this->event->getNick(),  $line);
+                    }
+                    break;
+                default:
+                    break;
+            }
+        
     }
     private function slap($channel) {
         $message = $this->getConnection()->getNick() .' slaps '. implode(' ',$this->usersPlugin->getUsers($channel)) .' with a tiny fish!';

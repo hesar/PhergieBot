@@ -8,9 +8,9 @@ return array(
         array(
             'host' => 'irc.rizon.net',
             'port' => 6666,
-            'username' => 'hesarBot',
-            'realname' => 'hesarBotRizon',
-            'nick' => 'hesarBot'
+            'username' => 'BlueBoss',
+            'realname' => 'BlueBoss',
+            'nick' => 'BlueBoss'
             // 'password' => 'Blueroserzadzi',
             // 'transport' => 'ssl', // uncomment to connect using SSL
             // 'encoding' => 'UTF-8', // uncomment if using UTF-8
@@ -19,9 +19,9 @@ return array(
         array(
             'host' => 'irc.quakenet.org',
             'port' => 6667,
-            'username' => 'hesarBot',
-            'realname' => 'hesarBotQuakenet',
-            'nick' => 'hesarBot'
+            'username' => 'bluerose',
+            'realname' => 'bluerose',
+            'nick' => 'bluerose'
         )
     ),
 
@@ -93,7 +93,7 @@ return array(
     'ui.enabled' => true,
 
     // Examples of a prefix for command-based plugins
-    'command.prefix' => '!',
+    'command.prefix' => '.',
     // If you uncomment the line above, this would invoke onCommandJoin 
     // in the Join plugin: !join #channel
     // By default, no prefix is assumed, so the same command would be 
@@ -119,16 +119,16 @@ return array(
     // never be received and terminates the connection
 
     // 'ping.ping' => 10, // 10 seconds
-    'nickserv.password' => '#1hesarBot',
-    'quakeserv.password' => '#1hesarBot',
+    'nickserv.password' => 'Blueroserzadzi',
+    'quakeserv.password' => 'ave666',
     'autojoin.channels' => array(
-        'irc.quakenet.org' => array('#bluebot' => 'test'), //array('#channel' => 'channel key')
-        'irc.rizon.net' => array('#bluebot2' => 'test')
+        'irc.quakenet.org' => array('#dowodztwo.erepublik.pl' => 'mechanicznapomarancza'), //array('#channel' => 'channel key')
+        'irc.rizon.net' => array('#bluerose.bicie')
     ),
     // define slap copy channels and networks
     'copycommand.channels' => array(
-        'channelFrom' => array('irc.quakenet.org' , '#bluebot'),
-        'channelTo' => array('irc.rizon.net' , '#bluebot2')
+        'channelFrom' => array('irc.quakenet.org' , '#dowodztwo.erepublik.pl'),
+        'channelTo' => array('irc.rizon.net' , '#bluerose.bicie')
     ),
     /*
      * array of users that are able to op themselves - BY nick

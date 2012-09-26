@@ -17,6 +17,10 @@ class Phergie_Plugin_GoogleCalendar extends Phergie_Plugin_Abstract
         $plugins->getPlugin('Command');
         $this->calendars = $this->getConfig('googlecalendars');
     }
+    public function onCommandSms() {
+        //some debugging
+        $this->createEvent('',$this->event->getRawData());
+    }
     
     public function onCommandSms2() {
         $args = $this->event->getArguments();
@@ -31,36 +35,60 @@ class Phergie_Plugin_GoogleCalendar extends Phergie_Plugin_Abstract
         $this->createEvent($this->calendars['sms4'] ,str_replace('!sms4 ', '', $args[1]));
     }
     
-    private function createEvent($calendar, $message) {
+    private function createEvent($calendar, $message = ' zbiorka ! ') {
         $apiClient = new apiClient();
+        $time = time();
         $at =   '{"access_token":"' . $this->access_token . '",' .
                 '"token_type":"Bearer",' .
                 '"expires_in":3600,' .
                 '"refresh_token":"' . $this->refresh_token . '",'.
-                '"created":' . time() . '}';
+                '"created":' . $time . '}';
 
         $apiClient->setAccessToken($at);
         $apiClient->refreshToken($this->refresh_token);
         $apiClient->setUseObjects(true);
         $service = new apiCalendarService($apiClient);
         $event = new Event();
-        
-        $event->setSummary('Zbiórka');
+        $event->setSummary($message);
         $event->setLocation('Kanał IRC');
         $start = $end = new EventDateTime();
-        $start->setDateTime('2012-09-20T15:00:00.000');
-        $end->setDateTime('2012-09-20T16:00:00.000');
+        $start->setDateTime(date(DateTime::RFC3339,$time));
+//        $start->setDateTime('2012-09-22T16:20:16.000Z');
+        $end->setDateTime(date(DateTime::RFC3339,$time));
+//        $end->setDateTime('2012-09-22T16:20:16.000Z');
         $start->setTimeZone('Europe/Warsaw');
         $end->setTimeZone('Europe/Warsaw');
         $event->setStart($start);
         $event->setEnd($end);
-        echo("\n wersja " . $service->version);
-        $createdEvent = $service->events->quickAdd(
-                $calendar,
-                $message
+        
+        $eventCreator = new EventCreator();
+        $eventCreator->setEmail($calendar);
+        $eventCreator->setDisplayName($calendar);
+        $event->setCreator($eventCreator);
+        
+        $reminder = new EventReminder();
+        $reminder->setMethod('sms');
+        $reminder->setMinutes(0);
+
+        $reminders = new EventReminders();
+        $reminders->setUseDefault(false);
+        $reminders->setOverrides(array($reminder));
+        
+        $event->setReminders($reminders);
+        $createdEvent = $service->events->insert(
+                $calendar,  //TODO - set $calendar variable
+                $event,
+                array('sendNotifications' => true)
                 );
+//        $createdEvent = $service->events->quickAdd(
+//                'hesar1975@gmail.com',
+//                'wiadomosc testowa metoda QuickAdd',
+//                array('sendNotifications' => true)
+//                );
+//        var_dump($createdEvent);
         $this->doPrivmsg($this->event->getSource(),'Utworzono wydarzenie : '.$createdEvent->created );
         
     }
+    
 }
 ?>

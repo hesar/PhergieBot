@@ -11,7 +11,7 @@ class Phergie_Plugin_QuakeServ extends Phergie_Plugin_Abstract
      * @var string
      */
     protected $botNick;
-
+    private $authed = false;
     /**
     * Identify message
     */
@@ -39,7 +39,12 @@ class Phergie_Plugin_QuakeServ extends Phergie_Plugin_Abstract
      */
     public function onNotice()
     {
-            
+//        var_dump($this->event->getArgument(1));
+            if($this->getConnection()->getHost() == "irc.quakenet.org" && strpos($this->event->getArgument(1),'logged in') != false)
+            {
+                $this->authed = true;
+                $this->callJoin();
+            }
     }
 
     /**
@@ -99,12 +104,13 @@ class Phergie_Plugin_QuakeServ extends Phergie_Plugin_Abstract
         }
     }
     public function onMode() {
+        if($this->authed) return;
         $password = $this->config['quakeserv.password'];
                     if (!empty($password)) {
                         $this->doPrivmsg($this->botNick,' AUTH '.  $this->connection->getUsername().' '. $this->config['quakeserv.password']);
                     }
                     unset($password);
-                    $this->callJoin();
+//                    $this->callJoin();
     }
 
     /**
@@ -129,7 +135,7 @@ class Phergie_Plugin_QuakeServ extends Phergie_Plugin_Abstract
 
     private function callJoin() {
             $keys = null;
-                if ($channels = $this->config['autojoin.channels']) {
+                if ($channels = $this->config['autojoin.channels']['irc.quakenet.org']) {
                     if (is_array($channels)) {
                         // Support autojoin.channels being in these formats:
                         // 'hostname' => array('#channel1', '#channel2', ... )
