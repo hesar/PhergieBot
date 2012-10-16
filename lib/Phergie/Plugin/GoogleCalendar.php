@@ -7,8 +7,8 @@ require(dirname(__FILE__).'/../GoogleApiLib/contrib/apiCalendarService.php');
  */
 class Phergie_Plugin_GoogleCalendar extends Phergie_Plugin_Abstract
 {
-    private $access_token = 'ya29.AHES6ZSjR_E521etEqOxVyTVIvYLUwQOTmZA2JknXsnyV9Z4E7IphA';
-    private $refresh_token = '1/uDfgGh-gfDljFj3nqdzeAOTAGFMoflaoEM72nnMjF4k';
+    private $access_token = '';
+    private $refresh_token = '';
     private $calendars; //array of calendars from config - googlecalendars
 
     
