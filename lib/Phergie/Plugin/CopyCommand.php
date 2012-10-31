@@ -70,8 +70,7 @@ class Phergie_Plugin_CopyCommand extends Phergie_Plugin_Abstract
         if($this->getConnection()->getHost() == $this->hostFrom && 
             $this->event->getSource() == $this->channelFrom && 
             $this->hasSufficientPrivileges($this->event->getNick(),$this->event->getSource()) && 
-            strpos($this->event->getArgument(1),'.slap') !== false &&
-            strpos($this->event->getArgument(1),'.hl') !== false)
+            strpos($this->event->getArgument(1),'.slap') !== false)
           {
               $this->startListening = true;
               $this->slap = true;
