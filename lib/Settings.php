@@ -11,7 +11,7 @@ return array(
             'username' => 'BlueBoss',
             'realname' => 'BlueBoss',
             'nick' => 'BlueBoss'
-            // 'password' => 'Blueroserzadzi',
+            // 'password' => 'password',
             // 'transport' => 'ssl', // uncomment to connect using SSL
             // 'encoding' => 'UTF-8', // uncomment if using UTF-8
             // 'context' => array('socket' => array('bindto' => '0.0.0.0:0')), // uncomment to force use of IPv4
@@ -120,9 +120,9 @@ return array(
 
     // 'ping.ping' => 10, // 10 seconds
     'nickserv.password' => 'Blueroserzadzi',
-    'quakeserv.password' => 'ave666',
+    'quakeserv.password' => 'password',
     'autojoin.channels' => array(
-        'irc.quakenet.org' => array('#dowodztwo.erepublik.pl' => 'mechanicznapomarancza'), //array('#channel' => 'channel key')
+        'irc.quakenet.org' => array('#dowodztwo.erepublik.pl' => 'password'), //array('#channel' => 'channel key')
         'irc.rizon.net' => array('#bluerose.bicie')
     ),
     // define slap copy channels and networks
