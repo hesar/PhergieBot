@@ -29,7 +29,7 @@ return array(
     'processor.options' => array('usec' => 1000000),
     // Time zone. See: http://www.php.net/manual/en/timezones.php
     'timezone' => 'UTC',
-    'debug' => true,
+    'debug' => false,
     // Whitelist of plugins to load
     'plugins' => array(
         // To enable a plugin, simply add a string to this array containing
